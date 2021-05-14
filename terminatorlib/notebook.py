@@ -175,6 +175,7 @@ class Notebook(Container, Gtk.Notebook):
         self.child_set_property(container, 'tab-fill', True)
         self.set_tab_reorderable(container, True)
         self.set_tab_label(container, label)
+        self.set_menu_label_text(container, 'label1')
         self.show_all()
 
         order = [widget, sibling]
@@ -307,11 +308,13 @@ class Notebook(Container, Gtk.Notebook):
                 break
 
         self.set_tab_label(widget, label)
-        self.child_set_property(widget, 'tab-expand', True)
-        self.child_set_property(widget, 'tab-fill', True)
+        self.set_menu_label_text(widget, self.window.get_title())
+        self.child_set_property(widget, 'tab-expand', False)
+        self.child_set_property(widget, 'tab-fill', False)
 
         self.set_tab_reorderable(widget, True)
         self.set_current_page(tabpos)
+        # self.set_menu_label_text(container, 'label1')
         self.show_all()
         if maker.isinstance(term_widget, 'Terminal'):
             widget.grab_focus()
@@ -411,7 +414,11 @@ class Notebook(Container, Gtk.Notebook):
             err('Notebook::update_tab_label_text: %s not found' % widget)
             return
 
-        label.set_label(text)
+        label.set_label(text[:150])
+
+        label.set_property("width-request", 250)
+        label.set_property("height-request", 15)
+        notebook.get_parent().set_menu_label_text(notebook,text)
 
     def hoover(self):
         """Clean up any empty tabs and if we only have one tab left, die"""
@@ -633,14 +640,15 @@ class TabLabel(Gtk.HBox):
     def update_angle(self):
         """Update the angle of a label"""
         position = self.notebook.get_tab_pos()
+        self.notebook.popup_enable()
         if position == Gtk.PositionType.LEFT:
             if hasattr(self, 'set_orientation'):
-                self.set_orientation(Gtk.Orientation.VERTICAL)
-            self.label.set_angle(90)
+                self.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.label.set_angle(0)
         elif position == Gtk.PositionType.RIGHT:
             if hasattr(self, 'set_orientation'):
-                self.set_orientation(Gtk.Orientation.VERTICAL)
-            self.label.set_angle(270)
+                self.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.label.set_angle(0)
         else:
             if hasattr(self, 'set_orientation'):
                 self.set_orientation(Gtk.Orientation.HORIZONTAL)
